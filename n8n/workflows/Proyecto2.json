@@ -1,0 +1,447 @@
+{
+  "name": "Trabajo2",
+  "nodes": [
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.text }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "CLIMA"
+            },
+            {
+              "value2": "PAIS",
+              "output": 1
+            },
+            {
+              "value2": "WIKIPEDIA",
+              "output": 2
+            },
+            {
+              "value2": "CHISTE",
+              "output": 3
+            },
+            {
+              "value2": "GENERAL",
+              "output": 3
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "51c50b0c-c902-4b0d-bb3b-7301907a7a87",
+      "name": "Switch Herramientas",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=40.4168&longitude=-3.7038&current=temperature_2m",
+        "options": {}
+      },
+      "id": "03e05c38-60fa-4204-9dd7-aabc5973f9dd",
+      "name": "OpenMeteo API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1344,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://restcountries.com/v3.1/name/' + ($node[\"Webhook\"].json.body.query || 'spain') }}",
+        "options": {}
+      },
+      "id": "e16a5d00-33e3-42ed-a25e-e534e659be2c",
+      "name": "REST Countries API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1344,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://es.wikipedia.org/api/rest_v1/page/summary/' + ($node[\"Webhook\"].json.body.query || 'Tecnología') }}",
+        "options": {}
+      },
+      "id": "36ab66b2-dc64-4e67-8c78-72fd75016bfc",
+      "name": "Wikipedia API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1344,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://v2.jokeapi.dev/joke/Programming?lang=es",
+        "options": {}
+      },
+      "id": "13f28e62-47d8-4261-a390-717c15ac5287",
+      "name": "JokeAPI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1344,
+        336
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3c304a93-3e34-46bd-a05d-a5a641c11c73",
+      "name": "Merge Respuestas",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        -992,
+        112
+      ],
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "conversaciones_chatbot",
+          "mode": "list",
+          "cachedResultName": "conversaciones_chatbot"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mensaje_usuario": "={{ $('Webhook').item.json.body.prompt }}",
+            "respuesta_bot": "={{ $json.text }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mensaje_usuario",
+              "displayName": "mensaje_usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_bot",
+              "displayName": "respuesta_bot",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "herramienta_usada",
+              "displayName": "herramienta_usada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f8f2f964-ea75-4199-b327-55288785b75d",
+      "name": "PostgreSQL Save",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        -496,
+        112
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "eVAi0KW39tWMmJ9L",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Clasifica el PROMPT del usuario en una sola de las siguientes CATEGORÍAS. \nResponde exclusivamente con la palabra de la categoría, sin puntos ni texto adicional.\n\nCATEGORÍAS:\n- CLIMA: Meteorología, temperatura, fenómenos atmosféricos o coordenadas.\n- PAIS: Información sobre naciones (gastronomía, moneda, cultura, geografía específica).\n- WIKIPEDIA: Peticiones de resúmenes o definiciones de conceptos y sustantivos.\n- CHISTE: Humor, bromas o chascarrillos.\n- GENERAL: Cualquier consulta que no encaje en las anteriores.\n\nPROMPT: {{ $json.body.prompt }}\n\nCategoría:",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1936,
+        144
+      ],
+      "id": "5afbe594-0a63-4710-a27c-cec3a2649f25",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        336
+      ],
+      "id": "9f51fa9c-454c-497a-b5e6-213d141c65f3",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "sjSbQcbG04FSoFDo",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot-multiherramienta",
+        "options": {}
+      },
+      "id": "69ed760d-cff5-4f68-afcb-e5b843b48052",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -2144,
+        144
+      ],
+      "webhookId": "f7a3f73b-93aa-4956-9291-3a715b29f689"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúa como un asistente personal amable, ingenioso y eficiente. Tu objetivo es responder a la consulta del usuario utilizando los DATOS PROCESADOS que se te proporcionan.\n\nREGLAS:\n1. Usa un tono natural y conversacional (evita parecer un robot o una lista de base de datos).\n2. Integra la información de los DATOS PROCESADOS de forma coherente en tu respuesta.\n3. Si los datos están vacíos o son insuficientes, indícalo con amabilidad.\n4. No menciones que estás leyendo \"campos JSON\" o \"nodos\"; simplemente responde.\n\nPREGUNTA DEL USUARIO: \n{{ $node[\"Webhook\"].json.body.prompt }}\n\nDATOS PROCESADOS PARA TU RESPUESTA:\n{{ Object.entries($json).map(([key, value]) => `* ${key}: ${typeof value === 'object' ? JSON.stringify(value) : value}`).join('\\n') }}\n\nRespuesta:",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -816,
+        112
+      ],
+      "id": "40fa2bca-1bea-43e7-aed7-43e2938888eb",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        320
+      ],
+      "id": "d6ca0229-2765-49f9-afe3-96a8c855b33b",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "sjSbQcbG04FSoFDo",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch Herramientas": {
+      "main": [
+        [
+          {
+            "node": "OpenMeteo API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "REST Countries API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wikipedia API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "JokeAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenMeteo API": {
+      "main": [
+        [
+          {
+            "node": "Merge Respuestas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REST Countries API": {
+      "main": [
+        [
+          {
+            "node": "Merge Respuestas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia API": {
+      "main": [
+        [
+          {
+            "node": "Merge Respuestas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JokeAPI": {
+      "main": [
+        [
+          {
+            "node": "Merge Respuestas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Respuestas": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Switch Herramientas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL Save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "d3c56d32-4e5f-421c-82bc-9b4f92a98fed",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb6819828a13c6626ca594b9958666207b46b4fb06e6645bed63c66b9980edc1"
+  },
+  "id": "GdlQ0FDlT6jHaOZUySuJC",
+  "tags": []
+}

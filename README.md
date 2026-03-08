@@ -135,6 +135,6 @@ El sistema utiliza **PostgreSQL** para mantener la trazabilidad. Las tablas prin
 
 Puedes ver el funcionamiento detallado de ambos proyectos, la arquitectura y los workflows en el siguiente enlace:
 
-👉 **[Enlace al vídeo en YouTube/Plataforma]**
+👉 **https://drive.google.com/file/d/1NBDlqM_Y-aHvF3AXFNCAt-GGVicImX7V/view?usp=sharing**
 
 ---

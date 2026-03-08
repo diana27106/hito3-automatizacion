@@ -1,0 +1,500 @@
+{
+  "name": "Trabajo1",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "rag_collection"
+        },
+        "options": {}
+      },
+      "id": "0d1ff2b7-942a-4ca2-9d57-fbd680500039",
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        832,
+        1040
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "qdrantApi": {
+          "id": "tqP2TP4VaESHwyLx",
+          "name": "QdrantApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "id": "b04e9856-e23b-4c72-98c5-e0e2d9f12ffb",
+      "name": "Embeddings Ollama",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "position": [
+        688,
+        1248
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "sjSbQcbG04FSoFDo",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "c0962db1-40ef-4a0a-a699-7d0a63da7ad9",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        928,
+        1248
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 200,
+        "chunkOverlap": 50,
+        "options": {}
+      },
+      "id": "cc3e135d-e14f-4fbb-8e56-6fb18408934f",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        928,
+        1472
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.pregunta }}",
+        "options": {
+          "systemMessage": "=Eres un asistente experto con acceso a una base de datos semántica especializada. \nTu objetivo es responder de forma precisa utilizando la herramienta de búsqueda cuando sea necesario.\n\nINSTRUCCIONES DE OPERACIÓN:\n1. ANALIZA: Determina si la pregunta del usuario requiere datos específicos de la base de datos.\n2. ARGUMENTA: Antes de llamar a la herramienta, explica brevemente por qué es necesaria esa consulta (p. ej., \"Para darte el dato exacto sobre la población, consultaré el registro histórico...\").\n3. EJECUTA: Si decides usar la herramienta, usa el formato: [SEARCH: \"término de búsqueda\"].\n4. RESPONDE: Una vez obtenidos los datos, elabora una respuesta útil y natural.\n\nCONTEXTO DEL USUARIO:\nPregunta: {{ $json.body.pregunta }}\nTU ANÁLISIS Y ACCIÓN:"
+        }
+      },
+      "id": "5d2076f8-291a-4869-a522-a28ca2d61fb1",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2288,
+        1008
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest",
+        "options": {}
+      },
+      "id": "31d307de-8230-4b54-b3ce-364416d2c5b5",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [
+        2128,
+        1248
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "sjSbQcbG04FSoFDo",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook: Chat').item.json.body.usuario_id }}"
+      },
+      "id": "229ae06f-b0e4-429b-8005-4778545fed6d",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        2336,
+        1248
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "retriever",
+        "toolDescription": "Retrieve data from a semantic database to answer questions",
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "rag_collection"
+        },
+        "options": {}
+      },
+      "id": "d9516037-a17d-4704-b3df-e5d0598190bf",
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        2480,
+        1248
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "qdrantApi": {
+          "id": "tqP2TP4VaESHwyLx",
+          "name": "QdrantApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "id": "02ad9a05-12d9-4422-ab71-5a5f60e3baca",
+      "name": "Embeddings Ollama1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "position": [
+        2528,
+        1472
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "sjSbQcbG04FSoFDo",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO documentos(nombre, num_chunks) \nVALUES ('{{ $('On form submission').item.json.File[0].filename }}', {{ $json.result.count }});",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1360,
+        1040
+      ],
+      "id": "afee8dad-0a76-4b5e-9b1a-a4514319f8a5",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "eVAi0KW39tWMmJ9L",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "point",
+        "operation": "countPoints",
+        "collectionName": {
+          "__rl": true,
+          "value": "rag_collection",
+          "mode": "list",
+          "cachedResultName": "rag_collection"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        1040
+      ],
+      "id": "c907dfe2-2d95-4c89-8834-887f966b2584",
+      "name": "Count Points",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "nEEGctvIhvIyIyKr",
+          "name": "Qdrant account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "consultas_rag",
+          "mode": "list",
+          "cachedResultName": "consultas_rag"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "respuesta": "={{ $json.output }}",
+            "pregunta": "={{ $('When chat message received').item.json.chatInput }}",
+            "id": 0,
+            "documentos_usados": "="
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pregunta",
+              "displayName": "pregunta",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta",
+              "displayName": "respuesta",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "documentos_usados",
+              "displayName": "documentos_usados",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "array",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2704,
+        1008
+      ],
+      "id": "a01eaa18-b53b-40c8-8445-b8567cf3d731",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "eVAi0KW39tWMmJ9L",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "dbd70d6e-7e0f-4eb1-88b8-5933a3fe130d",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        2016,
+        1008
+      ],
+      "webhookId": "5e56a263-3a40-44bd-bc9d-1cfb3bc2a87d",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "formTitle": "Add your file here",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "File",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf, .md, .txt",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6a6b090-206f-4fb4-914c-5f82f3b06ac5",
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        656,
+        1040
+      ],
+      "webhookId": "4e1e20d4-f759-42c8-8439-87b93f43aa7c",
+      "typeVersion": 2.2
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Count Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count Points": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "8221cdc5-966e-47af-9151-8ac08c28d317",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb6819828a13c6626ca594b9958666207b46b4fb06e6645bed63c66b9980edc1"
+  },
+  "id": "nr3XTjRi-n6A8e03qNnPk",
+  "tags": []
+}

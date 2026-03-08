@@ -1,0 +1,56 @@
+### Variables globales 
+### Nota: Usa /webhook-test para probar los flujos manualmente en n8n, 
+### o /webhook para cuando estén activados (producción).
+@baseUrl = http://localhost:5678/webhook-test
+
+
+### ===================================================================
+### PROYECTO B: CHATBOT MULTIHERRAMIENTA
+### ===================================================================
+
+### 1. Prueba de Intención: Clima (Debería enrutar a OpenMeteo)
+POST {{baseUrl}}/chatbot-multiherramienta
+Content-Type: application/json
+
+{
+  "mensaje": "¿Qué tiempo hace hoy en Madrid?",
+  "latitud": 40.4168,
+  "longitud": -3.7038,
+  "sesion_id": "chat_001"
+}
+
+### 2. Prueba de Intención: Información de Países (Debería enrutar a REST Countries)
+POST {{baseUrl}}/chatbot-multiherramienta
+Content-Type: application/json
+
+{
+  "mensaje": "Háblame sobre España. ¿Cuál es su capital y qué moneda usan?",
+  "sesion_id": "chat_001"
+}
+
+### 3. Prueba de Intención: Conocimiento general / Wikipedia (Debería enrutar a Wikipedia API)
+POST {{baseUrl}}/chatbot-multiherramienta
+Content-Type: application/json
+
+{
+  "mensaje": "¿Quién fue Marie Curie? Dame un resumen corto.",
+  "sesion_id": "chat_001"
+}
+
+### 4. Prueba de Intención: Chistes (Debería enrutar a JokeAPI)
+POST {{baseUrl}}/chatbot-multiherramienta
+Content-Type: application/json
+
+{
+  "mensaje": "Estoy aburrido, cuéntame un chiste de programadores.",
+  "sesion_id": "chat_001"
+}
+
+### 5. Prueba de Intención: General / Conversación (Debería responder Ollama directo)
+POST {{baseUrl}}/chatbot-multiherramienta
+Content-Type: application/json
+
+{
+  "mensaje": "Hola, ¿cómo estás hoy? ¿Qué eres capaz de hacer?",
+  "sesion_id": "chat_001"
+}

@@ -127,7 +127,7 @@ El sistema utiliza **PostgreSQL** para mantener la trazabilidad. Las tablas prin
 
 - **`documentos`**: Almacena el registro de archivos procesados y su conteo de chunks.
 - **`consultas_rag`**: Historial de preguntas, respuestas y fuentes utilizadas.
-- **`historial_chatbot`**: Registro de decisiones del agente y logs de conversación.
+- **`conversaciones_chatbot`**: Registro de decisiones del agente y logs de conversación.
 
 ---
 
